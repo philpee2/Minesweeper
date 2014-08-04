@@ -10,6 +10,12 @@ class Minesweeper
     
     puts "Would you like to start a new game? Y/N?"
     input = gets.chomp.downcase.to_sym
+    
+    until [:y, :n].include?(input) 
+      puts "Please enter either Y or N"
+      input = gets.chomp.downcase.to_sym
+    end 
+    
     if input == :y 
       
       puts "Choose a board size. Must be at least 4"
@@ -19,10 +25,10 @@ class Minesweeper
         dimension = Integer(gets.chomp)
       end
       
-      puts "Choose a difficulty, e m or h"
+      puts "Choose a difficulty, [e]asy, [m]edium or [h]ard"
       @diff = gets.chomp.to_sym
       until [:e, :m, :h].include?(@diff) do 
-        puts "Please select e m or h"
+        puts "Please enter e m or h"
         @diff = gets.chomp.to_sym
       end 
       
@@ -133,7 +139,7 @@ class Minesweeper
         pos = [Integer(str[1]), Integer(str[2])]      
       end 
       
-        raise BadInputError, "Invalid command" unless [:r, :f].include?(command)
+        raise BadInputError, "Invalid command" unless [:r, :f].include?(command) 
         raise BadInputError, "Invalid Positions" unless @board.is_valid?(pos)
       
         rescue BadInputError => e

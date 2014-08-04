@@ -109,7 +109,7 @@ class Board
     transposed = @grid.transpose
     transposed.each_with_index do |row,index|
       new_row = row.map do |tile|
-        tile.bombed ? "B" : tile.to_s
+        tile.bombed ? "M" : tile.to_s
       end 
       puts "#{index} | #{new_row.join(" ")}"
     end
