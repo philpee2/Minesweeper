@@ -13,6 +13,16 @@ Alternatively, you can load a saved game rather than starting a new one. When as
 
 Choose a move by entering the letter "r" or "f" for reveal or flag, followed by a two-integer coordinate on the board. For example, a valid move would be "r02" to reveal the tile at coordinate (0, 2).
 
-To save the current game state, enter the "save" command. This will save the game to the "Minesweeper.save" file, overriding whatever game is currently stored there. It will not end the game. 
+To save the current game state, enter the "save" command. This will save the game to the "Minesweeper.save" file, overriding whatever game is currently stored there. It will not end the current game. 
 
 On the game board, "*" indicates an unrevealed tile. An integer indicates the number of adjacent tiles that contain a mine. "_" indicates that there are no adjacent tiles with a mine. "F" indicates a flagged tile. In the end-game board display, "M" indicates a tile with a mine on it. 
+
+## Future Todos
+
+### Known bugs
+
+* Invalid Command message on save - When a user enters the "save" command to save the current game, they'll receive the "Invalid command" message, which should not appear
+* Leaderboard - Displaying and saving to the leaderboard does not currently work
+
+### Additional features
+ * Multiple save files - Currently, users can store to exactly one save file. I'd like to allow them to enter a save name, which creates a file of that name, and then load that save using its name. 
