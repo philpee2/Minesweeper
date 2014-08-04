@@ -4,8 +4,10 @@ require "debugger"
 
 class Minesweeper
   
+   DIFF_HASH = { :e => 1, :m => 2, :h => 3 }
+  
+  
   def initialize
-    puts "Leaderboard"
     display_winners
     
     puts "Would you like to start a new game? Y/N?"
@@ -19,10 +21,10 @@ class Minesweeper
     if input == :y 
       
       puts "Choose a board size. Must be at least 4"
-      dimension = Integer(gets.chomp)
-      until dimension >= 4 do 
+      dimension = gets.chomp.to_i
+      until dimension && dimension >= 4 do
         puts "Please select a dimension of at least 4"
-        dimension = Integer(gets.chomp)
+        dimension = gets.chomp.to_i
       end
       
       puts "Choose a difficulty, [e]asy, [m]edium or [h]ard"
@@ -46,10 +48,9 @@ class Minesweeper
       @timer_set = false
       @score = 0
     else 
-      # puts "Enter a filename"
-      # file_name = gets.chomp
-      file_name = "Minesweeper.save"
-      @board, @flags_remaining = YAML.load_file(file_name)
+      puts "Enter a filename to load from"
+      file_name = gets.chomp
+      @board, @flags_remaining, @diff = YAML.load_file(file_name)
       run 
     end 
   end     
@@ -60,7 +61,7 @@ class Minesweeper
       one_turn
       unless @timer_set
         @start_time = Time.new 
-        @timer_set=true
+        @timer_set = true
       end      
     end
     if @board.won? 
@@ -74,30 +75,48 @@ class Minesweeper
     
   end 
   
-  def display_winners
-    leaderboard = YAML.load_file("leaderboard.save")
-    if leaderboard 
-      array = leaderboard.sort_by{ |name, score| score }
-      array.each do |name, score|
-        puts "#{name}: #{score}"
-      end 
-    end
+  private 
+  
+  def dimension
+    @board.dimension
+  end 
+  
+  def display_winners(pairs = false)
+    # Displays a leaderboard either as a given paramter, or by loading a file. 
+    
+    if pairs
+      leaderboard = pairs
+    else 
+      leaderboard = YAML.load_file("leaderboard.save")
+    end 
+    sorted = leaderboard.sort_by{ |name, score| score }
+    puts "\nLeaderboard:"
+    puts
+    sorted.reverse.each_with_index do |pair, index|
+      name = pair[0]
+      score = pair[1]
+      puts "#{index + 1}. #{name}: #{score}"
+    end 
+    puts
   end 
   
   def game_complete
     elapsed_time = (Time.new - @start_time).to_i
-    puts "The game completed in #{elapsed_time.to_i} seconds "
+    puts "You completed the game in #{elapsed_time.to_i} seconds."
+    diff_multiplier = DIFF_HASH[@diff]
+    score = (diff_multiplier * dimension * 13000) / (elapsed_time + 1)
+    
+    puts "Your score is #{score}."
 
     puts "Input your name!"
     name = gets.chomp
-    diff_hash = { :e => 1, :m => 2, :h => 3 }
-    diff_multiplier = diff_hash[@diff]
-    score = (diff_multiplier * @dimesions * 13000) / elapsed_time
+
     
-    score_hash = YAML.load_file("leaderboard.save")
-    score_hash[name] = score 
+    score_pairs = YAML.load_file("leaderboard.save")
+    score_pairs << [name, score] 
+    display_winners(score_pairs)
     File.open("leaderboard.save", "w") do |f|
-      f.puts score_hash.to_yaml
+      f.puts score_pairs.to_yaml
     end 
   end
   
@@ -157,8 +176,10 @@ class Minesweeper
   
   
   def save
-    game_yaml = [@board, @flags_remaining].to_yaml
-    File.open("Minesweeper.save", "w") do |f|
+    game_yaml = [@board, @flags_remaining, @diff].to_yaml
+    puts "Enter a file name to save your game to."
+    file_name = gets.chomp
+    File.open(file_name, "w") do |f|
       f.puts game_yaml
     end 
     puts "Your game has been saved"
